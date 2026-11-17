@@ -1,0 +1,808 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Eliott Blanchard</title>
+<meta name="description" content="Portfolio d'Eliott Blanchard présenté comme un iPhone : écran verrouillé, widgets et applications CV, formation, projets, GitHub et LinkedIn.">
+<style>
+/* Concept : un iPhone complet. Écran verrouillé, glisser pour ouvrir, écran d'accueil façon iOS
+   (widgets, grille d'icônes, recherche, dock), puis une application par rubrique. */
+:root{
+  --ink:#0A1019;
+  --glass:rgba(255,255,255,.2);
+  --glass-line:rgba(255,255,255,.3);
+  --sheet:#F2F2F7;
+  --card:#FFFFFF;
+  --text:#101318;
+  --muted:#5A606C;
+  --line:#D9DBE1;
+  --blue:#0A66C2;
+  --green:#1F9D55;
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{margin:0;background:var(--ink);color:var(--text);font-family:var(--font);-webkit-text-size-adjust:100%;overflow:hidden}
+button{font:inherit;color:inherit}
+.stage{height:100%;display:flex;align-items:center;justify-content:center}
+.phone{position:relative;width:100%;height:100%;overflow:hidden;background:#000;isolation:isolate}
+@media (min-width:520px){
+  .phone{width:390px;height:min(844px,96%);border-radius:54px;border:11px solid #1B2029;box-shadow:0 0 0 2px #323A48,0 40px 90px rgba(0,0,0,.6)}
+  .phone::before{content:"";position:absolute;top:11px;left:50%;transform:translateX(-50%);width:112px;height:32px;border-radius:20px;background:#000;z-index:60}
+}
+.wall{position:absolute;inset:0;z-index:0;background:
+  radial-gradient(75% 42% at 0% 22%,#1740C8 0%,transparent 70%),
+  radial-gradient(60% 38% at 100% 12%,#2A86F0 0%,transparent 70%),
+  radial-gradient(70% 40% at 90% 62%,#2FB8B0 0%,transparent 72%),
+  radial-gradient(60% 36% at 8% 88%,#58CFB4 0%,transparent 72%),
+  linear-gradient(180deg,#1C4FD0 0%,#2784D6 45%,#2FA9A6 100%)}
+.wall::after{content:"";position:absolute;inset:0;background:radial-gradient(60% 30% at 40% 45%,rgba(255,255,255,.28),transparent 70%)}
+
+/* barre d'état */
+.status{position:absolute;top:0;left:0;right:0;height:54px;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:14px 30px 0 34px;font-size:15px;font-weight:600;color:#fff;pointer-events:none;transition:color .25s}
+.phone[data-view="app"] .status{color:#111}
+.phone[data-view="lock"] .status .tm{visibility:hidden}
+.status svg{height:12px;width:auto;fill:currentColor;display:block}
+.status .ic{display:flex;align-items:center;gap:6px}
+@media (max-width:519px){.status{padding-top:10px}}
+
+/* écran verrouillé */
+.lock{position:absolute;inset:0;z-index:40;color:#fff;display:flex;flex-direction:column;align-items:center;padding:78px 20px 0;touch-action:none;user-select:none;-webkit-user-select:none;
+  transition:transform .45s cubic-bezier(.2,.8,.2,1),opacity .3s;background:linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.28))}
+.lock.drag{transition:none}
+.lock.off{transform:translateY(-105%);opacity:0;pointer-events:none;visibility:hidden;transition:transform .45s cubic-bezier(.2,.8,.2,1),opacity .3s,visibility 0s .45s}
+.padlock{width:22px;height:30px;margin-bottom:10px}
+.padlock path{stroke:#fff;stroke-width:2.4;fill:none;stroke-linecap:round}
+.padlock rect{fill:#fff}
+.ldate{font-size:20px;font-weight:600;letter-spacing:.01em;text-transform:capitalize;opacity:.92}
+.ltime{font-size:98px;line-height:1;font-weight:300;letter-spacing:-.02em;margin-top:2px;font-variant-numeric:tabular-nums}
+.notif{width:100%;margin-top:36px;padding:13px 14px;border-radius:22px;background:var(--glass);border:1px solid var(--glass-line);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);display:flex;gap:12px;align-items:flex-start}
+.notif+.notif{margin-top:10px}
+.notif .ni{flex:none;width:38px;height:38px;border-radius:9px;background:linear-gradient(160deg,#4C8DFF,#1D4ED8);display:flex;align-items:center;justify-content:center}
+.notif .ni svg{width:22px;height:22px;fill:none;stroke:#fff;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.notif b{display:flex;justify-content:space-between;font-size:15px;gap:8px}
+.notif b i{font-style:normal;font-weight:400;font-size:13px;opacity:.75}
+.notif p{margin:2px 0 0;font-size:14.5px;line-height:1.35}
+.lock-bottom{margin-top:auto;width:100%;display:flex;flex-direction:column;align-items:center;gap:14px;padding-bottom:62px}
+.lock-bottom .row{width:100%;display:flex;justify-content:space-between;padding:0 18px}
+.round{width:50px;height:50px;border-radius:50%;background:var(--glass);border:1px solid var(--glass-line);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);display:flex;align-items:center;justify-content:center}
+.round svg{width:22px;height:22px;fill:none;stroke:#fff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.hint{font-size:14px;opacity:.9;animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.45}}
+
+/* écran d'accueil */
+.home{position:absolute;inset:0;z-index:10;padding:66px 18px 0;color:#fff;display:flex;flex-direction:column;gap:16px;transition:transform .4s,opacity .3s,filter .3s}
+.home.under{transform:scale(1.08);opacity:0;filter:blur(6px)}
+.phone[data-view="app"] .home{transform:scale(.93);opacity:.4}
+.widgets{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.wcol{display:flex;flex-direction:column;gap:6px;min-width:0}
+.wcap{text-align:center;font-size:11.5px;font-weight:500;text-shadow:0 1px 3px rgba(0,0,0,.5);opacity:.95}
+.w{border-radius:24px;padding:14px;height:158px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;min-width:0;position:relative}
+.wx{background:linear-gradient(170deg,#4A93E8 0%,#2A5FB8 100%);box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.wx .loc{font-size:15px;font-weight:600;display:flex;align-items:center;gap:4px}
+.wx .loc svg{width:11px;height:11px;fill:#fff}
+.wx .t{font-size:44px;font-weight:300;line-height:1;margin-top:2px}
+.wx .c{font-size:13px;font-weight:600;display:flex;align-items:center;gap:5px;margin-top:2px}
+.wx .c svg{width:18px;height:18px}
+.wx .r{font-size:13px;opacity:.9}
+.map{background:#E9EEE2;color:#111;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.map svg.bg{position:absolute;inset:0;width:100%;height:100%}
+.map .av{position:absolute;top:12px;right:12px;width:40px;height:40px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center}
+.map .av span{width:32px;height:32px;border-radius:50%;background:linear-gradient(160deg,#5EE3B0,#0E8F70);color:#06251D;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.map .tx{position:absolute;left:0;right:0;bottom:0;padding:10px 12px 12px;background:rgba(255,255,255,.88);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.map .tx small{display:block;font-size:11px;color:#6B717C}
+.map .tx b{display:block;font-size:14px;line-height:1.2}
+.map .tx span{display:block;font-size:12px;color:#4A505B}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px 6px}
+.app{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:11.5px;color:#fff;text-align:center;text-shadow:0 1px 3px rgba(0,0,0,.55)}
+.app:focus-visible,.homebar:focus-visible,.back:focus-visible,.btn:focus-visible,.copy:focus-visible,.lrow:focus-visible{outline:3px solid #fff;outline-offset:3px;border-radius:14px}
+.icon{width:60px;height:60px;border-radius:14px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;box-shadow:0 3px 8px rgba(0,0,0,.28);transition:transform .15s}
+.app:active .icon{transform:scale(.9)}
+.icon svg{width:30px;height:30px;fill:none;stroke:#fff;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.icon svg.raw{width:60px;height:60px;stroke:none}
+.icon .in{font-size:27px;font-weight:700;letter-spacing:-.05em;color:#fff}
+.cal-i{background:#fff;flex-direction:column;gap:0}
+.cal-i .d1{color:#FF3B30;font-size:11px;font-weight:600;letter-spacing:.05em;line-height:1;margin-top:3px}
+.cal-i .d2{color:#111;font-size:34px;font-weight:300;line-height:1.05}
+.search{align-self:center;margin-top:auto;padding:7px 18px;border-radius:999px;background:rgba(255,255,255,.28);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);font-size:13px;font-weight:500;display:flex;align-items:center;gap:6px;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+.search svg{width:12px;height:12px;fill:none;stroke:#fff;stroke-width:2.4;stroke-linecap:round}
+.dock{margin:0 -4px 36px;padding:13px;border-radius:32px;background:var(--glass);border:1px solid var(--glass-line);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);display:grid;grid-template-columns:repeat(4,1fr);gap:6px;justify-items:center}
+.dock .app span.lbl{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* applications */
+.appscreen{position:absolute;inset:0;z-index:30;background:var(--sheet);color:var(--text);display:flex;flex-direction:column;
+  transform:scale(.88);opacity:0;visibility:hidden;border-radius:44px;transition:transform .3s cubic-bezier(.2,.8,.2,1),opacity .22s,visibility 0s .3s}
+.appscreen.open{transform:none;opacity:1;visibility:visible;border-radius:0;transition:transform .3s cubic-bezier(.2,.8,.2,1),opacity .22s}
+.nav{padding:58px 10px 4px;display:flex}
+.back{all:unset;cursor:pointer;display:flex;align-items:center;gap:2px;color:#0A63D6;font-size:17px;padding:8px 10px;border-radius:10px}
+.back svg{width:12px;height:20px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.content{flex:1;overflow-y:auto;padding:0 16px 96px;display:flex;flex-direction:column;gap:16px}
+h1{margin:4px 4px 0;font-size:34px;line-height:1.1;font-weight:800;letter-spacing:-.02em}
+.lead{margin:-8px 4px 0;color:var(--muted);font-size:15.5px;line-height:1.4}
+.group{background:var(--card);border-radius:14px;padding:4px 16px}
+.group>*+*{border-top:1px solid var(--line)}
+.item{padding:13px 0;min-width:0}
+.item .h{display:flex;justify-content:space-between;align-items:center;gap:12px;font-weight:600;font-size:16.5px}
+.item .h em{font-style:normal;font-weight:400;color:var(--muted);font-size:14.5px;white-space:nowrap}
+.item p{margin:3px 0 0;color:var(--muted);font-size:15px;line-height:1.4}
+.item ul{margin:6px 0 0;padding-left:18px;color:#2C3038;font-size:15px;line-height:1.45}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px;vertical-align:1px}
+.label{margin:2px 6px -8px;font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;padding:12px 0}
+.chip{padding:6px 12px;border-radius:999px;background:#EAF3F0;color:#0B5A47;font-size:14px;font-weight:500}
+.todo{display:flex;gap:12px;align-items:flex-start;padding:13px 0}
+.todo i{flex:none;width:24px;height:24px;border-radius:50%;background:#0A84FF;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.todo i svg{width:13px;height:13px;fill:none;stroke:#fff;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.todo b{display:block;font-size:16.5px;font-weight:600}
+.todo span{display:block;font-size:14.5px;color:var(--muted);line-height:1.35}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;min-height:52px;border-radius:14px;background:#0A63D6;color:#fff;text-decoration:none;font-weight:600;font-size:16.5px;padding:0 16px;text-align:center}
+.btn.green{background:var(--green)}
+.btn.dark{background:#161B22}
+.btn.li{background:var(--blue)}
+.mono{font-variant-numeric:tabular-nums}
+.rowline{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 0}
+.rowline .k{font-size:13px;color:var(--muted)}
+.rowline .v{font-size:17px;word-break:break-all}
+.copy{all:unset;cursor:pointer;flex:none;padding:8px 13px;border-radius:999px;background:#E7EEFB;color:#0A4FAE;font-size:14px;font-weight:600}
+.copy:focus-visible{outline-color:#0A63D6}
+.avatar{width:92px;height:92px;border-radius:50%;background:linear-gradient(160deg,#5EE3B0,#0E8F70);color:#06251D;display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:700;align-self:center;margin-top:8px}
+.center{text-align:center}
+.chat{display:flex;flex-direction:column;gap:6px;padding:6px 2px}
+.b{max-width:82%;padding:9px 14px;border-radius:19px;font-size:16px;line-height:1.35;background:#E5E5EA;color:#111;align-self:flex-start}
+.chat time{align-self:center;font-size:12px;color:var(--muted);margin:4px 0}
+.ghicon,.liicon{width:76px;height:76px;border-radius:18px;display:flex;align-items:center;justify-content:center;align-self:center;margin-top:8px}
+.ghicon{background:linear-gradient(160deg,#3A4350,#0B0E12)}
+.liicon{background:var(--blue)}
+.ghicon svg{width:38px;height:38px;fill:none;stroke:#fff;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.liicon span{font-size:36px;font-weight:700;color:#fff;letter-spacing:-.05em}
+.bigtime{font-size:72px;font-weight:200;text-align:center;letter-spacing:-.02em;font-variant-numeric:tabular-nums;margin:8px 0 0}
+.wallet{border-radius:18px;padding:18px;background:linear-gradient(150deg,#1B2432,#0A0F18);color:#fff;aspect-ratio:1.6/1;max-width:100%;display:flex;flex-direction:column;justify-content:space-between}
+.wallet small{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#5EE3B0;font-weight:700}
+.wallet b{font-size:24px;letter-spacing:-.01em}
+.wallet span{font-size:14px;opacity:.85}
+.lrow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 0;text-decoration:none;color:inherit;font-size:17px}
+.lrow svg{width:8px;height:14px;fill:none;stroke:#B0B4BC;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.lrow small{display:block;font-size:13px;color:var(--muted)}
+
+
+/* Messages : liste et conversation */
+.app[data-open="messages"]{position:relative}
+.badge{position:absolute;top:-7px;left:calc(50% + 11px);min-width:22px;height:22px;padding:0 6px;border-radius:11px;background:#FF3B30;color:#fff;font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(0,0,0,.3);text-shadow:none;z-index:2}
+.badge[hidden]{display:none}
+.nav.split{justify-content:space-between;align-items:center;padding-right:16px}
+.compose{all:unset;cursor:pointer;color:#0A63D6;padding:8px;border-radius:10px}
+.compose:focus-visible{outline:3px solid #0A63D6}
+.compose svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;display:block}
+.msearch{display:flex;align-items:center;gap:8px;background:#E3E3E8;border-radius:11px;height:38px;padding:0 10px;color:#6B6F78}
+.msearch svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;flex:none}
+.msearch input{all:unset;flex:1;min-width:0;font-size:17px;color:#101318}
+.msearch input::placeholder{color:#6B6F78}
+.mlist{margin:0 -16px;background:#fff}
+.mrow{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:flex-start;gap:8px;width:100%;padding:0 16px 0 8px}
+.mrow[hidden]{display:none}
+.mrow:focus-visible{outline:3px solid #0A63D6;outline-offset:-3px}
+.mrow .ud{flex:none;width:10px;height:10px;border-radius:50%;background:#0A6CE0;margin-top:26px}
+.mrow .ud.read{background:transparent}
+.mrow .av2{flex:none;width:48px;height:48px;border-radius:50%;background:linear-gradient(160deg,#FFB8D0,#E56B9A);color:#fff;font-size:21px;font-weight:600;display:flex;align-items:center;justify-content:center;margin:12px 4px 0 0}
+.mrow .mx{flex:1;min-width:0;padding:12px 0;border-bottom:1px solid #E1E1E6}
+.mrow .mt1{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.mrow .mt1 b{font-size:17px;font-weight:600;color:#101318}
+.mrow .mt1 span{display:flex;align-items:center;gap:6px;color:#6B6F78;font-size:15px}
+.mrow .mt1 svg{width:8px;height:14px;fill:none;stroke:#B0B4BC;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.mrow p{margin:1px 0 0;font-size:15px;line-height:1.3;color:#6B6F78;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.thead{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:56px 6px 8px;background:#F7F7F9;border-bottom:1px solid #D9DBE1}
+.thead .back{justify-self:start}
+.tav{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12px}
+.tav i{width:40px;height:40px;border-radius:50%;background:linear-gradient(160deg,#FFB8D0,#E56B9A);color:#fff;font-style:normal;font-size:18px;font-weight:600;display:flex;align-items:center;justify-content:center}
+.tbody{flex:1;overflow-y:auto;background:#fff;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.tbody time{align-self:center;font-size:12px;color:var(--muted);margin:4px 0}
+.b.me{background:#0A6CE0;color:#fff;align-self:flex-end}
+.dl{align-self:flex-end;font-size:12px;color:var(--muted);margin:-2px 4px 0 0}
+.composer{display:flex;align-items:center;gap:8px;padding:8px 12px 34px;background:#fff}
+.composer input{flex:1;min-width:0;height:38px;border:1px solid #C7C7CC;border-radius:19px;padding:0 14px;font:inherit;font-size:16px;color:#101318;background:#fff;outline:none}
+.composer input:focus{border-color:#0A6CE0}
+.send{all:unset;cursor:pointer;flex:none;width:32px;height:32px;border-radius:50%;background:#0A6CE0;display:flex;align-items:center;justify-content:center;transition:opacity .15s}
+.send:disabled{opacity:.35;cursor:default}
+.send:focus-visible{outline:3px solid #0A63D6;outline-offset:2px}
+.send svg{width:16px;height:16px;fill:none;stroke:#fff;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+
+
+/* Rappels */
+.rhead{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin:4px 4px 0}
+.rhead h1{margin:0;color:#B85400}
+.rcount{font-size:34px;font-weight:700;line-height:1.1;color:#B85400;font-variant-numeric:tabular-nums}
+.rem{display:flex;gap:12px;align-items:flex-start;padding:13px 0}
+.rcheck{all:unset;cursor:pointer;flex:none;width:24px;height:24px;border-radius:50%;border:1.8px solid #A9AEB8;box-sizing:border-box;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.rcheck:focus-visible{outline:3px solid #B85400;outline-offset:2px}
+.rem.done .rcheck{background:#B85400;border-color:#B85400}
+.rem.done .rcheck::after{content:"";width:6px;height:11px;border:solid #fff;border-width:0 2.4px 2.4px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.rem .rt{display:block;font-size:17px;line-height:1.3;word-break:break-word}
+.rem.done .rt{color:var(--muted);text-decoration:line-through}
+.rem small{display:block;font-size:13.5px;color:#C4001A;margin-top:2px}
+.rem.done small{color:var(--muted)}
+.radd{display:flex;gap:8px}
+.radd input{flex:1;min-width:0;height:46px;border:0;border-radius:12px;background:#fff;padding:0 14px;font:inherit;font-size:16px;color:#101318;outline:none}
+.radd input:focus{box-shadow:0 0 0 2px #B85400}
+.rplus{all:unset;cursor:pointer;flex:none;width:46px;height:46px;border-radius:12px;background:#B85400;display:flex;align-items:center;justify-content:center}
+.rplus:disabled{opacity:.35;cursor:default}
+.rplus:focus-visible{outline:3px solid #B85400;outline-offset:2px}
+.rplus svg{width:20px;height:20px;fill:none;stroke:#fff;stroke-width:2.6;stroke-linecap:round}
+
+
+/* MonCV */
+.cvbar{display:flex;gap:10px}
+.cvbar .btn{flex:1}
+.btn.alt{background:#E7EEFB;color:#0A4FAE}
+.cvwrap{border-radius:12px;overflow:auto;background:#fff;box-shadow:0 2px 12px rgba(0,0,0,.14);max-height:62vh;-webkit-overflow-scrolling:touch}
+.cvwrap button{all:unset;display:block;cursor:zoom-in;width:100%}
+.cvwrap button:focus-visible{outline:3px solid #0A63D6;outline-offset:-3px}
+.cvwrap img{display:block;width:100%;height:auto;max-width:none}
+.cvwrap.zoom button{cursor:zoom-out;width:240%}
+.cvhint{margin:-6px 4px 0;text-align:center;font-size:13px;color:var(--muted)}
+
+
+/* Photos : galerie et visionneuse */
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin:0 -16px}
+.thumb{all:unset;cursor:pointer;display:block;position:relative;overflow:hidden;aspect-ratio:1/1.35;background:#DADDE3}
+.thumb .shot{position:absolute;top:0;left:0;transform-origin:0 0;pointer-events:none}
+.thumb:focus-visible{outline:3px solid #0A63D6;outline-offset:-3px}
+.pcount{text-align:center;color:var(--muted);font-size:15px;margin-top:-4px}
+#photo{background:#000;color:#fff}
+.vnav{padding:56px 10px 6px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center}
+#photo .back{color:#4DA3FF;justify-self:start}
+.vtitle{font-size:14px;font-weight:600;text-align:center;max-width:210px;line-height:1.25}
+.vstage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:6px 16px;touch-action:pan-y}
+.vframe{position:relative;overflow:hidden;border-radius:10px;background:#fff;flex:none}
+.vframe .shot{position:absolute;top:0;left:0;transform-origin:0 0}
+.vbar{display:flex;align-items:center;justify-content:space-between;padding:8px 28px 40px}
+.vbtn{all:unset;cursor:pointer;width:44px;height:44px;border-radius:50%;background:#2C2C2E;display:flex;align-items:center;justify-content:center}
+.vbtn:disabled{opacity:.3;cursor:default}
+.vbtn:focus-visible{outline:3px solid #4DA3FF;outline-offset:2px}
+.vbtn svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.vcount{font-size:14px;color:#C7C7CC}
+.phone.dk[data-view="app"] .status{color:#fff}
+.phone.dk[data-view="app"] .homebar::after{background:#fff}
+
+/* captures d'écran fictives (génériques, sans marque réelle) */
+.shot{width:390px;height:844px;background:#fff;color:#111;font-family:var(--font);position:relative;overflow:hidden;text-align:left;line-height:1.3}
+.shot *{box-sizing:border-box}
+.sh-st{height:50px;padding:16px 28px 0;display:flex;justify-content:space-between;font-size:15px;font-weight:600}
+.sh-bat{display:block;width:25px;height:12px;border:1.5px solid currentColor;border-radius:4px;position:relative;margin-top:3px}
+.sh-bat::after{content:"";position:absolute;inset:1.5px 7px 1.5px 1.5px;background:currentColor;border-radius:1.5px}
+.jb{background:#F3F5F9}
+.jbh{background:#1F4FA3;color:#fff;padding:0 16px 18px}
+.jbh b{display:block;font-size:20px;margin:6px 0 12px}
+.fld{background:#fff;color:#111;border-radius:10px;padding:12px 14px;font-size:16px}
+.jbn{padding:14px 16px 8px;font-size:14px;color:#4A5666}
+.jbn b{color:#111}
+.jc{background:#fff;margin:0 16px 10px;border-radius:12px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.jc b{display:block;font-size:16px}
+.jc span{display:block;font-size:14px;color:#4A5666;margin-top:3px}
+.jc small{display:block;font-size:12.5px;color:#7A818C;margin-top:6px}
+.jc i{display:inline-block;font-style:normal;font-size:12px;background:#E3EEFF;color:#1F4FA3;border-radius:6px;padding:2px 8px;margin-top:8px}
+.fr{padding:16px 20px;border-bottom:1px solid #EEE}
+.fr small{display:block;color:#7A818C;font-size:13px;margin-bottom:4px}
+.fr b{font-size:17px}
+.trk{position:relative;height:4px;background:#D5DAE2;border-radius:2px;margin-top:16px}
+.trk i{position:absolute;left:0;top:0;bottom:0;background:#1F4FA3;border-radius:2px}
+.trk u{position:absolute;top:-8px;width:20px;height:20px;border-radius:50%;background:#fff;border:2px solid #1F4FA3;transform:translateX(-50%)}
+.pl{display:flex;gap:8px;margin-top:6px}
+.pl em{font-style:normal;padding:8px 14px;border-radius:999px;border:1px solid #CBD0D8;font-size:15px}
+.pl em.on{background:#1F4FA3;color:#fff;border-color:#1F4FA3}
+.tg{width:50px;height:30px;border-radius:15px;background:#D5DAE2;position:relative}
+.tg::after{content:"";position:absolute;top:2px;left:2px;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.sh-btn{background:#1F4FA3;color:#fff;border-radius:14px;padding:16px;text-align:center;font-weight:700;font-size:17px}
+.ml{display:flex;gap:8px;padding:10px 16px 10px 8px;border-top:1px solid #E5E5EA}
+.ml i{flex:none;width:10px;height:10px;border-radius:50%;background:#0A6CE0;margin-top:7px}
+.ml i.r{background:transparent}
+.ml div{flex:1;min-width:0}
+.ml b{display:flex;justify-content:space-between;font-size:16px}
+.ml b span{font-weight:400;color:#7A818C;font-size:14px}
+.ml em{display:block;font-style:normal;font-size:15px}
+.ml p{margin:2px 0 0;font-size:14.5px;color:#6B6F78;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.st3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 16px}
+.st3 div{background:#fff;border-radius:12px;padding:12px;text-align:center}
+.st3 b{display:block;font-size:28px}
+.st3 span{font-size:12px;color:#6B6F78}
+.tb{margin:14px 16px 0;background:#fff;border-radius:12px;overflow:hidden;font-size:14px}
+.tb div{display:grid;grid-template-columns:1.2fr 1fr 1.2fr;padding:11px 12px;border-top:1px solid #EEE}
+.tb div:first-child{border-top:0;font-weight:700;background:#FFF3C4}
+.bu{max-width:78%;padding:10px 14px;border-radius:18px;font-size:16px;line-height:1.35;margin:0 16px 4px auto;background:#0A6CE0;color:#fff;width:fit-content}
+.bs{margin:0 20px 14px auto;text-align:right;font-size:12px;color:#7A818C}
+.term{background:#0C0C0C;color:#E6E6E6;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;padding:0 14px;line-height:1.7}
+.term p{margin:0;white-space:pre-wrap;word-break:break-all}
+.term .g{color:#5EE3B0}
+.wk{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;padding:0 12px;font-size:13px;color:#7A818C}
+.wk span{padding:6px 0}
+.wk b{display:flex;width:34px;height:34px;margin:0 auto;align-items:center;justify-content:center;border-radius:50%;font-size:18px;color:#111;font-weight:500}
+.wk b.today{background:#FF3B30;color:#fff}
+
+/* barre d'accueil */
+.homebar{position:absolute;left:50%;bottom:6px;transform:translateX(-50%);z-index:55;width:160px;height:30px;background:none;border:0;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.homebar::after{content:"";width:134px;height:5px;border-radius:3px;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.18);transition:background .25s}
+.phone[data-view="app"] .homebar::after{background:#111;box-shadow:none}
+.toast{position:absolute;left:50%;bottom:92px;transform:translate(-50%,20px);z-index:70;background:#161B22;color:#fff;padding:8px 16px;border-radius:999px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01s!important;animation:none!important}}
+</style>
+
+<div class="stage">
+<div class="phone" id="phone" data-view="lock">
+  <div class="wall"></div>
+
+  <div class="status" aria-hidden="true">
+    <span class="tm" id="stime">12:00</span>
+    <span class="ic">
+      <svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>
+      <svg viewBox="0 0 17 12"><path d="M8.5 2.4c2.4 0 4.6.9 6.2 2.5l1-1A10.3 10.3 0 0 0 8.5 1 10.3 10.3 0 0 0 1.3 3.9l1 1a8.8 8.8 0 0 1 6.2-2.5zm0 3.6c1.4 0 2.6.5 3.6 1.4l1-1a7.4 7.4 0 0 0-9.2 0l1 1c1-.9 2.2-1.4 3.6-1.4zm0 3.4c-.7 0-1.3.3-1.8.7l1.8 1.9 1.8-1.9c-.5-.4-1.1-.7-1.8-.7z"/></svg>
+      <svg viewBox="0 0 27 12" style="height:12px"><rect x=".5" y=".5" width="22" height="11" rx="3.2" fill="none" stroke="currentColor" opacity=".5"/><rect x="2" y="2" width="19" height="8" rx="2"/><rect x="24" y="4" width="2" height="4" rx="1" opacity=".5"/></svg>
+    </span>
+  </div>
+
+  <!-- ÉCRAN D'ACCUEIL -->
+  <div class="home under" id="home" inert>
+    <div class="widgets">
+      <div class="wcol">
+        <div class="w wx" role="img" aria-label="Météo à Lyon, 9 degrés, éclaircies">
+          <div>
+            <div class="loc">Lyon <svg viewBox="0 0 12 12"><path d="M11 1L1 5.2l4 1.4 1.4 4z"/></svg></div>
+            <div class="t">9°</div>
+          </div>
+          <div>
+            <div class="c"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="8" r="3"/><path d="M8 2v1.5M2 8h1.5M3.8 3.8l1 1M12.2 3.8l-1 1"/><path d="M8 20h9a4 4 0 0 0 .6-7.95A5.5 5.5 0 0 0 7 13.5 3.3 3.3 0 0 0 8 20z"/></svg>Éclaircies</div>
+            <div class="r">Max 12° Min 5°</div>
+          </div>
+        </div>
+        <div class="wcap">Météo</div>
+      </div>
+      <div class="wcol">
+        <div class="w map">
+          <svg class="bg" viewBox="0 0 170 158" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <rect width="170" height="158" fill="#E8EDE0"/>
+            <path d="M0 40h60l30 30h80v40H70L40 80H0z" fill="#CFE8C4"/>
+            <path d="M120 0l50 40v30l-60-50z" fill="#A9D3EC"/>
+            <path d="M-5 100L60 60l60 40 60-20" stroke="#fff" stroke-width="7" fill="none"/>
+            <path d="M40 0l30 158M110 0l-10 158" stroke="#fff" stroke-width="5" fill="none"/>
+            <path d="M-5 30l190 60" stroke="#F6E27A" stroke-width="4" fill="none"/>
+          </svg>
+          <div class="av"><span>EB</span></div>
+          <div class="tx"><small>Maintenant</small><b>Disponible</b><span>Alternance dès [mois année]</span></div>
+        </div>
+        <div class="wcap">Disponibilité</div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <button class="app" data-open="formation"><span class="icon cal-i"><span class="d1" id="cdow">MAR</span><span class="d2" id="cday">17</span></span>Calendrier</button>
+      <button class="app" data-open="photos"><span class="icon" style="background:#fff"><svg class="raw" viewBox="0 0 60 60" style="mix-blend-mode:multiply" aria-hidden="true"><g style="mix-blend-mode:multiply" opacity=".9"><ellipse cx="30" cy="18.5" rx="7.5" ry="11" fill="#FF453A"/><ellipse cx="30" cy="18.5" rx="7.5" ry="11" fill="#FF9F0A" transform="rotate(45 30 30)"/><ellipse cx="30" cy="18.5" rx="7.5" ry="11" fill="#FFD60A" transform="rotate(90 30 30)"/><ellipse cx="30" cy="18.5" rx="7.5" ry="11" fill="#32D74B" transform="rotate(135 30 30)"/><ellipse cx="30" cy="18.5" rx="7.5" ry="11" fill="#40C8E0" transform="rotate(180 30 30)"/><ellipse cx="30" cy="18.5" rx="7.5" ry="11" fill="#0A84FF" transform="rotate(225 30 30)"/><ellipse cx="30" cy="18.5" rx="7.5" ry="11" fill="#BF5AF2" transform="rotate(270 30 30)"/><ellipse cx="30" cy="18.5" rx="7.5" ry="11" fill="#FF6EA8" transform="rotate(315 30 30)"/></g></svg></span>Photos</button>
+      <button class="app" data-open="mail"><span class="icon" style="background:linear-gradient(180deg,#5AC8FA,#0A7AFF)"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></span>Mail</button>
+      <button class="app" data-open="projets"><span class="icon" style="background:#fff"><i style="position:absolute;top:0;left:0;right:0;height:19px;background:#FFD60A"></i><svg class="raw" viewBox="0 0 60 60" aria-hidden="true"><path d="M11 33h38M11 42h38M11 51h24" stroke="#C7C7CC" stroke-width="1.7" stroke-linecap="round" fill="none"/></svg></span>Notes</button>
+
+      <button class="app" data-open="rappels"><span class="icon" style="background:#fff"><svg class="raw" viewBox="0 0 60 60" aria-hidden="true"><circle cx="14" cy="17" r="4.2" fill="#FF9F0A"/><circle cx="14" cy="30" r="4.2" fill="#0A84FF"/><circle cx="14" cy="43" r="4.2" fill="#FF453A"/><path d="M24 17h26M24 30h26M24 43h26" stroke="#C7C7CC" stroke-width="1.7" stroke-linecap="round"/></svg></span>Rappels</button>
+      <button class="app" data-open="dispo"><span class="icon" style="background:#000"><svg class="raw" viewBox="0 0 60 60" aria-hidden="true"><circle cx="30" cy="30" r="25.5" fill="#fff"/><g id="ticks" stroke="#111" stroke-linecap="round"></g><line id="hh" x1="30" y1="30" x2="30" y2="17" stroke="#111" stroke-width="2.8" stroke-linecap="round"/><line id="mh" x1="30" y1="30" x2="30" y2="11" stroke="#111" stroke-width="2" stroke-linecap="round"/><line id="sh" x1="30" y1="34" x2="30" y2="9" stroke="#FF9F0A" stroke-width="1.1" stroke-linecap="round"/><circle cx="30" cy="30" r="2" fill="#FF9F0A"/></svg></span>Horloge</button>
+      <button class="app" data-open="moncv"><span class="icon" style="background:linear-gradient(160deg,#173A5E,#0B1626)"><svg class="raw" viewBox="0 0 60 60" aria-hidden="true"><rect x="15" y="10" width="30" height="40" rx="4" fill="#fff"/><rect x="15" y="10" width="30" height="13" rx="4" fill="#5EE3B0"/><rect x="15" y="17" width="30" height="6" fill="#5EE3B0"/><text x="30" y="21.5" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-weight="800" font-size="11" fill="#06251D">CV</text><path d="M21 31h18M21 37h18M21 43h11" stroke="#B8C0CC" stroke-width="2.2" stroke-linecap="round"/></svg></span>MonCV</button>
+
+    </div>
+
+    <div class="search"><svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="5" cy="5" r="3.6"/><path d="M8 8l3 3"/></svg>Recherche</div>
+    <div class="dock">
+      <button class="app" data-open="telephone"><span class="icon" style="background:linear-gradient(160deg,#37D56F,#16803C)"><svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg></span><span class="lbl">Téléphone</span></button>
+      <button class="app" data-open="messages"><span class="icon" style="background:linear-gradient(160deg,#37D56F,#16803C)"><svg viewBox="0 0 24 24"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg></span><span class="lbl">Messages</span><span class="badge" id="badge">1</span></button>
+      <button class="app" data-open="github"><span class="icon" style="background:linear-gradient(160deg,#3A4350,#0B0E12)"><svg viewBox="0 0 24 24"><path d="M8 8l-4 4 4 4M16 8l4 4-4 4M13.5 5l-3 14"/></svg></span><span class="lbl">GitHub</span></button>
+      <button class="app" data-open="linkedin"><span class="icon" style="background:#0A66C2"><span class="in">in</span></span><span class="lbl">LinkedIn</span></button>
+    </div>
+  </div>
+
+  <!-- APPLICATIONS -->
+  <section class="appscreen" id="formation" inert aria-label="Calendrier, formation">
+    <div class="nav"><button class="back" data-home><svg viewBox="0 0 12 20"><path d="M10 2L2 10l8 8"/></svg>Accueil</button></div>
+    <div class="content">
+      <h1>Formation</h1>
+      <div class="group">
+        <div class="item"><div class="h"><span><span class="dot" style="background:#FF3B30"></span>Master en Cybersécurité</span><em>2022 – 2025</em></div><p>Guardia Cybersecurity School, Lyon</p></div>
+        <div class="item"><div class="h"><span><span class="dot" style="background:#FF9500"></span>Première année de médecine</span><em>2021 – 2022</em></div><p>Université de Montpellier</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="appscreen" id="photos" inert aria-label="Photos">
+    <div class="nav"><button class="back" data-home><svg viewBox="0 0 12 20"><path d="M10 2L2 10l8 8"/></svg>Accueil</button></div>
+    <div class="content">
+      <h1>Photothèque</h1>
+      <div class="pgrid" id="pgrid"></div>
+      <div class="pcount" id="pcount">10 captures d’écran</div>
+    </div>
+  </section>
+
+  <section class="appscreen" id="photo" inert aria-label="Capture d’écran">
+    <div class="vnav"><button class="back" data-goto="photos"><svg viewBox="0 0 12 20"><path d="M10 2L2 10l8 8"/></svg>Photothèque</button><div class="vtitle" id="vtitle"></div><span></span></div>
+    <div class="vstage" id="vstage"><div class="vframe" id="vframe"></div></div>
+    <div class="vbar"><button class="vbtn" id="vprev" aria-label="Capture précédente"><svg viewBox="0 0 12 20"><path d="M9 3L2 10l7 7"/></svg></button><span class="vcount" id="vcount"></span><button class="vbtn" id="vnext" aria-label="Capture suivante"><svg viewBox="0 0 12 20"><path d="M3 3l7 7-7 7"/></svg></button></div>
+  </section>
+
+  <section class="appscreen" id="mail" inert aria-label="Mail">
+    <div class="nav"><button class="back" data-home><svg viewBox="0 0 12 20"><path d="M10 2L2 10l8 8"/></svg>Accueil</button></div>
+    <div class="content">
+      <h1>Mail</h1>
+      <div class="group">
+        <div class="rowline"><div style="min-width:0"><div class="k">À</div><div class="v" id="mail-addr">blanchardeliott01@gmail.com</div></div><button class="copy" data-copy="#mail-addr">Copier</button></div>
+        <div class="rowline"><div><div class="k">Objet</div><div class="v">Alternance cybersécurité</div></div></div>
+      </div>
+      <a class="btn" href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=blanchardeliott01%40gmail.com&amp;su=Alternance%20cybers%C3%A9curit%C3%A9" target="_blank" rel="noopener">Écrire avec Gmail</a>
+    </div>
+  </section>
+
+  <section class="appscreen" id="projets" inert aria-label="Notes, projets">
+    <div class="nav"><button class="back" data-home><svg viewBox="0 0 12 20"><path d="M10 2L2 10l8 8"/></svg>Accueil</button></div>
+    <div class="content">
+      <h1>Projets</h1>
+      <div class="group">
+        <div class="item"><div class="h"><span>Site web dynamique</span></div><p>Site vitrine en HTML/CSS, puis automatisé avec JavaScript, PHP et MySQL.</p></div>
+        <div class="item"><div class="h"><span>Sécurisation du site</span></div><p>Correction des failles XSS et des injections SQL.</p></div>
+        <div class="item"><div class="h"><span>Laboratoire système</span></div><p>Machines virtuelles Windows, Debian et Ubuntu.</p></div>
+        <div class="item"><div class="h"><span>[Ton prochain projet]</span></div><p>CTF, TryHackMe, RootMe ou projet de cours à ajouter ici.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="appscreen" id="dispo" inert aria-label="Horloge, disponibilité">
+    <div class="nav"><button class="back" data-home><svg viewBox="0 0 12 20"><path d="M10 2L2 10l8 8"/></svg>Accueil</button></div>
+    <div class="content">
+      <h1>Disponibilité</h1>
+      <div class="bigtime" id="dtime">12:00</div>
+      <div class="group">
+        <div class="item"><div class="h"><span>Alternance en cybersécurité</span></div><p>Rythme : [rythme]</p></div>
+        <div class="item"><div class="h"><span>Début</span></div><p>[mois année]</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="appscreen" id="telephone" inert aria-label="Téléphone">
+    <div class="nav"><button class="back" data-home><svg viewBox="0 0 12 20"><path d="M10 2L2 10l8 8"/></svg>Accueil</button></div>
+    <div class="content">
+      <div class="avatar" aria-hidden="true">EB</div>
+      <h1 class="center">Eliott Blanchard</h1>
+      <p class="lead center">Étudiant en cybersécurité à Guardia, Lyon</p>
+      <div class="group"><div class="item"><div class="h"><span>Notes</span></div><p style="color:#2C3038">Je mets en pratique le développement web, l’administration de systèmes et la sécurisation d’applications. Deux ans de management d’équipe m’ont appris la rigueur, le respect des procédures et le travail sous pression.</p></div></div>
+      <div class="group">
+        <div class="rowline"><div><div class="k">mobile</div><div class="v mono" id="tel">06 08 18 54 96</div></div><button class="copy" data-copy="#tel">Copier</button></div>
+      </div>
+      <a class="btn green" href="tel:+33608185496">Appeler</a>
+    </div>
+  </section>
+
+  <section class="appscreen" id="moncv" inert aria-label="MonCV">
+    <div class="nav"><button class="back" data-home><svg viewBox="0 0 12 20"><path d="M10 2L2 10l8 8"/></svg>Accueil</button></div>
+    <div class="content">
+      <h1>MonCV</h1>
+      <div class="cvwrap" id="cvwrap"><button type="button" id="cvzoom" aria-label="Agrandir ou réduire le CV"><img src="cv-eliott-blanchard.png" alt="CV d’Eliott Blanchard, étudiant en cybersécurité : profil, formation, expérience, projets et compétences" width="1323" height="1871"></button></div>
+      <div class="cvhint">Touche le CV pour zoomer</div>
+      <div class="cvbar"><a class="btn" data-link="cv" target="_blank" rel="noopener">Ouvrir le PDF</a></div>
+    </div>
+  </section>
+
+  <section class="appscreen" id="rappels" inert aria-label="Rappels">
+    <div class="nav"><button class="back" data-home><svg viewBox="0 0 12 20"><path d="M10 2L2 10l8 8"/></svg>Accueil</button></div>
+    <div class="content">
+      <div class="rhead"><h1>Rappels</h1><span class="rcount" id="rcount" aria-live="polite">1</span></div>
+      <div class="group" id="rlist">
+        <div class="rem"><button class="rcheck" aria-pressed="false" aria-label="Marquer comme terminé"></button><div><span class="rt">Trouver une alternance rapidement !!</span><small>Aujourd’hui</small></div></div>
+      </div>
+      <form class="radd" id="rform" autocomplete="off">
+        <input id="rinput" type="text" placeholder="Nouveau rappel" aria-label="Nouveau rappel" enterkeyhint="done">
+        <button class="rplus" id="rplus" type="submit" aria-label="Ajouter" disabled><svg viewBox="0 0 20 20"><path d="M10 4v12M4 10h12"/></svg></button>
+      </form>
+    </div>
+  </section>
+
+  <section class="appscreen" id="messages" inert aria-label="Messages">
+    <div class="nav split"><button class="back" data-home><svg viewBox="0 0 12 20"><path d="M10 2L2 10l8 8"/></svg>Accueil</button><button class="compose" data-goto="maman" aria-label="Nouveau message"><svg viewBox="0 0 24 24"><path d="M12 5H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-6"/><path d="M17.5 3.5a1.8 1.8 0 0 1 2.6 2.6L11 15l-4 1 1-4z"/></svg></button></div>
+    <div class="content">
+      <h1>Messages</h1>
+      <label class="msearch"><svg viewBox="0 0 16 16"><circle cx="7" cy="7" r="5"/><path d="M11 11l4 4"/></svg><input id="msearch" type="search" placeholder="Rechercher" autocomplete="off" aria-label="Rechercher dans les messages"></label>
+      <div class="mlist">
+        <button class="mrow" id="mrow" data-goto="maman"><span class="ud" id="ud"></span><span class="av2" aria-hidden="true">M</span>
+          <span class="mx"><span class="mt1"><b>Maman</b><span><span class="mt">12:20</span><svg viewBox="0 0 8 14"><path d="M1.5 1l6 6-6 6"/></svg></span></span>
+          <p id="mprev">J’espère tu as trouvé une alternance !! J’en ai marre de te voir à la maison !!</p></span></button>
+      </div>
+    </div>
+  </section>
+
+  <section class="appscreen" id="maman" inert aria-label="Conversation avec Maman">
+    <div class="thead"><button class="back" data-goto="messages"><svg viewBox="0 0 12 20"><path d="M10 2L2 10l8 8"/></svg>Messages</button><div class="tav"><i aria-hidden="true">M</i>Maman</div><span></span></div>
+    <div class="tbody" id="tbody">
+      <time>Aujourd’hui <span class="mt">12:20</span></time>
+      <div class="b">J’espère tu as trouvé une alternance !! J’en ai marre de te voir à la maison !!</div>
+    </div>
+    <form class="composer" id="composer" autocomplete="off">
+      <input id="minput" type="text" placeholder="iMessage" aria-label="Ta réponse à Maman" enterkeyhint="send">
+      <button class="send" id="send" type="submit" aria-label="Envoyer" disabled><svg viewBox="0 0 16 16"><path d="M8 13V3M3.5 7.5L8 3l4.5 4.5"/></svg></button>
+    </form>
+  </section>
+
+  <section class="appscreen" id="github" inert aria-label="GitHub">
+    <div class="nav"><button class="back" data-home><svg viewBox="0 0 12 20"><path d="M10 2L2 10l8 8"/></svg>Accueil</button></div>
+    <div class="content">
+      <div class="ghicon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 8l-4 4 4 4M16 8l4 4-4 4M13.5 5l-3 14"/></svg></div>
+      <h1 class="center">GitHub</h1>
+      <p class="lead center" data-linktext="github">github.com/Oliancem</p>
+      <div class="group"><div class="item"><p style="color:#2C3038">Mes projets de développement web et de sécurité. Le détail est dans l’application Notes.</p></div></div>
+      <a class="btn dark" data-link="github" target="_blank" rel="noopener">Ouvrir GitHub</a>
+    </div>
+  </section>
+
+  <section class="appscreen" id="linkedin" inert aria-label="LinkedIn">
+    <div class="nav"><button class="back" data-home><svg viewBox="0 0 12 20"><path d="M10 2L2 10l8 8"/></svg>Accueil</button></div>
+    <div class="content">
+      <div class="liicon" aria-hidden="true"><span>in</span></div>
+      <h1 class="center">LinkedIn</h1>
+      <p class="lead center" data-linktext="linkedin">linkedin.com/in/eliott-blanchard-b2b11b220</p>
+      <div class="group"><div class="item"><p style="color:#2C3038">Mon parcours et mes expériences. Je réponds aux messages de recruteurs.</p></div></div>
+      <a class="btn li" data-link="linkedin" target="_blank" rel="noopener">Ouvrir LinkedIn</a>
+    </div>
+  </section>
+
+  <!-- ÉCRAN VERROUILLÉ -->
+  <div class="lock" id="lock">
+    <svg class="padlock" id="padlock" viewBox="0 0 22 30" aria-hidden="true"><path id="shackle" d="M5 13V9a6 6 0 0 1 12 0v4"/><rect x="2" y="13" width="18" height="15" rx="4"/></svg>
+    <div class="ldate" id="ldate">mardi 17 novembre</div>
+    <div class="ltime" id="ltime">12:00</div>
+    <div class="notif">
+      <div class="ni" style="background:linear-gradient(160deg,#37D56F,#16803C)"><svg viewBox="0 0 24 24"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg></div>
+      <div style="min-width:0">
+        <b><span>Maman</span><i>maintenant</i></b>
+        <p>J’espère tu as trouvé une alternance !! J’en ai marre de te voir à la maison !!</p>
+      </div>
+    </div>
+    <div class="notif">
+      <div class="ni" style="background:#fff"><svg viewBox="0 0 60 60" style="width:28px;height:28px" aria-hidden="true"><circle cx="14" cy="17" r="4.5" style="fill:#FF9F0A;stroke:none"/><circle cx="14" cy="30" r="4.5" style="fill:#0A84FF;stroke:none"/><circle cx="14" cy="43" r="4.5" style="fill:#FF453A;stroke:none"/><path d="M24 17h26M24 30h26M24 43h26" style="stroke:#C7C7CC;stroke-width:3;fill:none"/></svg></div>
+      <div style="min-width:0">
+        <b><span>Rappels</span><i>maintenant</i></b>
+        <p>Trouver une alternance rapidement !!</p>
+      </div>
+    </div>
+    <div class="lock-bottom">
+      <div class="row">
+        <div class="round" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 3h6v4l-1 2v12h-4V9L9 7z"/></svg></div>
+        <div class="round" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></div>
+      </div>
+      <div class="hint">Glisse vers le haut pour déverrouiller</div>
+    </div>
+  </div>
+
+  <button class="homebar" id="homebar" aria-label="Déverrouiller"></button>
+  <div class="toast" id="toast" role="status"></div>
+</div>
+</div>
+
+<div id="shots" hidden>
+<div class="shot jb" data-title="Recherche : alternance cybersécurité"><div class="jbh" style="padding-top:0"><div class="sh-st" style="padding-left:12px;padding-right:12px"><span>9:41</span><i class="sh-bat"></i></div><b>Recherche d’emploi</b><div class="fld">alternance cybersécurité</div><div class="fld" style="margin-top:8px">Lyon (69)</div></div><div class="jbn"><b>214 offres</b> · Alternance</div><div class="jc"><b>Alternant Analyste SOC (H/F)</b><span>Entreprise confidentielle · Lyon (69)</span><small>Il y a 2 jours</small><i>Candidature simple</i></div><div class="jc"><b>Alternant Pentester (H/F)</b><span>Entreprise confidentielle · Lyon (69)</span><small>Il y a 2 jours</small><i>Candidature simple</i></div><div class="jc"><b>Alternance Administrateur systèmes et réseaux</b><span>Entreprise confidentielle · Villeurbanne (69)</span><small>Il y a 3 jours</small><i>Candidature simple</i></div><div class="jc"><b>Alternant Technicien cybersécurité</b><span>Entreprise confidentielle · Lyon (69)</span><small>Il y a 4 jours</small><i>Candidature simple</i></div><div class="jc"><b>Alternant Consultant GRC (H/F)</b><span>Entreprise confidentielle · Lyon (69)</span><small>Il y a 5 jours</small><i>Candidature simple</i></div></div>
+<div class="shot" data-title="Filtres de recherche"><div class="sh-st"><span>9:41</span><i class="sh-bat"></i></div><div style="display:flex;justify-content:space-between;align-items:center;padding:8px 20px 14px;border-bottom:1px solid #E1E1E6"><b style="font-size:20px">Filtres</b><span style="color:#1F4FA3;font-size:15px">Réinitialiser</span></div><div class="fr"><small>Lieu</small><b>Lyon (69)</b></div><div class="fr"><small>Rayon</small><b>30 km</b><div class="trk"><i style="width:30%"></i><u style="left:30%"></u></div></div><div class="fr"><small>Type de contrat</small><div class="pl"><em class="on">Alternance</em><em>Stage</em><em>CDI</em></div></div><div class="fr"><small>Niveau d’études</small><div class="pl"><em>Bac+2</em><em>Bac+3</em><em class="on">Bac+5</em></div></div><div class="fr" style="display:flex;justify-content:space-between;align-items:center"><b>Télétravail uniquement</b><div class="tg"></div></div><div class="sh-btn" style="position:absolute;left:20px;right:20px;bottom:40px">Voir 214 offres</div></div>
+<div class="shot" data-title="Candidature envoyée" style="display:flex;flex-direction:column"><div class="sh-st"><span>9:41</span><i class="sh-bat"></i></div><div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 32px;text-align:center;gap:14px"><div style="width:84px;height:84px;border-radius:50%;background:#1F9D55;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div><b style="font-size:26px">Candidature envoyée</b><span style="color:#4A5666;font-size:16px;line-height:1.45">Alternant Analyste SOC (H/F)<br>Ton CV a été transmis au recruteur.</span><span style="color:#7A818C;font-size:14px">Tu seras prévenu s’il consulte ta candidature.</span></div><div class="sh-btn" style="margin:0 20px 40px">Continuer à chercher</div></div>
+<div class="shot" data-title="Boîte de réception"><div class="sh-st"><span>9:41</span><i class="sh-bat"></i></div><div style="padding:6px 16px;display:flex;justify-content:space-between;color:#0A63D6;font-size:17px"><span>Boîtes</span><span>Modifier</span></div><div style="padding:0 16px 8px;font-size:32px;font-weight:800">Réception</div><div class="ml"><i class=""></i><div><b>Service recrutement<span>09:14</span></b><em>Accusé de réception de votre candidature</em><p>Nous avons bien reçu votre candidature pour le poste d’alternant. Elle sera étudiée prochainement.</p></div></div><div class="ml"><i class=""></i><div><b>Réponse automatique<span>09:02</span></b><em>Votre candidature a bien été enregistrée</em><p>Ceci est un message automatique, merci de ne pas y répondre.</p></div></div><div class="ml"><i class="r"></i><div><b>Recrutement<span>Hier</span></b><em>Suite à votre candidature</em><p>Après étude attentive de votre profil, nous ne pouvons pas donner suite pour le moment.</p></div></div><div class="ml"><i class="r"></i><div><b>Alertes emploi<span>Hier</span></b><em>12 nouvelles offres d’alternance près de chez vous</em><p>Découvrez les offres publiées aujourd’hui à Lyon et dans les environs.</p></div></div><div class="ml"><i class="r"></i><div><b>Service RH<span>Lundi</span></b><em>Réponse automatique : absence</em><p>Je suis absent(e) du bureau et je répondrai à mon retour.</p></div></div><div class="ml"><i class="r"></i><div><b>Alertes emploi<span>Dimanche</span></b><em>Ces offres pourraient vous intéresser</em><p>Alternance cybersécurité, administrateur systèmes, développeur web.</p></div></div><div class="ml"><i class="r"></i><div><b>Service recrutement<span>12 nov.</span></b><em>Accusé de réception</em><p>Merci pour l’intérêt que vous portez à notre entreprise.</p></div></div></div>
+<div class="shot" data-title="Suivi de mes candidatures" style="background:#F2F2F7"><div class="sh-st"><span>9:41</span><i class="sh-bat"></i></div><div style="padding:6px 16px 12px;font-size:28px;font-weight:800">Suivi candidatures</div><div class="st3"><div><b>47</b><span>envoyées</span></div><div><b>3</b><span>refus auto</span></div><div><b>0</b><span>entretien</span></div></div><div class="tb"><div><span>Poste</span><span>Statut</span><span>Réponse</span></div><div><span>Candidature 1</span><span>Envoyée</span><span>Aucune réponse</span></div><div><span>Candidature 2</span><span>Envoyée</span><span>Refus automatique</span></div><div><span>Candidature 3</span><span>Envoyée</span><span>Aucune réponse</span></div><div><span>Candidature 4</span><span>Envoyée</span><span>En attente</span></div><div><span>Candidature 5</span><span>Envoyée</span><span>Aucune réponse</span></div><div><span>Candidature 6</span><span>Envoyée</span><span>Refus automatique</span></div><div><span>Candidature 7</span><span>Envoyée</span><span>En attente</span></div><div><span>Candidature 8</span><span>Envoyée</span><span>Aucune réponse</span></div><div><span>Candidature 9</span><span>Envoyée</span><span>En attente</span></div></div></div>
+<div class="shot" data-title="Message à un recruteur" style="background:#fff"><div class="sh-st"><span>9:41</span><i class="sh-bat"></i></div><div style="display:flex;align-items:center;gap:10px;padding:6px 16px 12px;border-bottom:1px solid #E5E5EA"><div style="width:40px;height:40px;border-radius:50%;background:#C9CFD8;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700">R</div><div><b style="font-size:17px">Recruteur</b><div style="font-size:13px;color:#7A818C">Messagerie professionnelle</div></div></div><div style="padding:18px 0 0"><div class="bu">Bonjour, je suis étudiant en Master Cybersécurité et je recherche une alternance. Seriez-vous disponible pour échanger ?</div><div class="bs">Vu à 09:12</div><div class="bu">Je me permets de vous relancer au sujet de ma candidature. Merci d’avance !</div><div class="bs">Vu à 14:03</div></div></div>
+<div class="shot term" data-title="Envoi de candidatures dans le terminal"><div class="sh-st" style="padding:16px 14px 0;color:#E6E6E6"><span>9:41</span><i class="sh-bat"></i></div><p class="g">PS C:\scrap cv&gt; python envoi_candidatures.py</p><p>30 mail(s) à envoyer (dry run : False)</p><p>[1/30] Entreprise 1 -&gt; rh@exemple.fr</p><p>[2/30] Entreprise 2 -&gt; jobs@exemple.fr</p><p>[3/30] Entreprise 3 -&gt; recrutement@exemple.fr</p><p>[4/30] Entreprise 4 -&gt; rh@exemple.fr</p><p>[5/30] Entreprise 5 -&gt; carrieres@exemple.fr</p><p>[6/30] Entreprise 6 -&gt; jobs@exemple.fr</p><p>[7/30] Entreprise 7 -&gt; recrutement@exemple.fr</p><p>[8/30] Entreprise 8 -&gt; rh@exemple.fr</p><p>[9/30] Entreprise 9 -&gt; jobs@exemple.fr</p><p>[10/30] Entreprise 10 -&gt; rh@exemple.fr</p><p>[11/30] Entreprise 11 -&gt; recrutement@exemple.fr</p><p>[12/30] Entreprise 12 -&gt; jobs@exemple.fr</p></div>
+<div class="shot" data-title="Agenda de la semaine"><div class="sh-st"><span>9:41</span><i class="sh-bat"></i></div><div style="padding:6px 16px 10px;color:#FF3B30;font-size:20px;font-weight:600">novembre 2026</div><div class="wk"><span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span><b>16</b><b class="today">17</b><b>18</b><b>19</b><b>20</b><b>21</b><b>22</b></div><div style="margin:26px 16px 0;padding-top:16px;border-top:1px solid #E5E5EA"><div style="font-size:14px;color:#7A818C">mardi 17 novembre</div><div style="font-size:24px;font-weight:700;margin-top:10px">Aucun événement</div><div style="font-size:15px;color:#6B6F78;margin-top:8px">Aucun entretien prévu cette semaine.</div></div></div>
+<div class="shot jb" data-title="Recherche : alternance cybersécurité en télétravail"><div class="jbh" style="padding-top:0"><div class="sh-st" style="padding-left:12px;padding-right:12px"><span>9:41</span><i class="sh-bat"></i></div><b>Recherche d’emploi</b><div class="fld">alternance cybersécurité télétravail</div><div class="fld" style="margin-top:8px">Lyon (69)</div></div><div class="jbn"><b>12 offres</b> · Alternance</div><div class="jc"><b>Alternant Analyste cybersécurité (H/F)</b><span>Entreprise confidentielle · France entière</span><small>Il y a 1 jour</small><i>Télétravail complet</i></div><div class="jc"><b>Alternant DevSecOps (H/F)</b><span>Entreprise confidentielle · France entière</span><small>Il y a 3 jours</small><i>Télétravail complet</i></div><div class="jc"><b>Alternance Support sécurité</b><span>Entreprise confidentielle · France entière</span><small>Il y a 6 jours</small><i>Télétravail complet</i></div><div class="jc"><b>Alternant Auditeur sécurité</b><span>Entreprise confidentielle · France entière</span><small>Il y a 1 semaine</small><i>Télétravail complet</i></div></div>
+<div class="shot" data-title="Réponse à ma candidature"><div class="sh-st"><span>9:41</span><i class="sh-bat"></i></div><div style="padding:6px 16px 12px;color:#0A63D6;font-size:17px">‹ Réception</div><div style="display:flex;gap:10px;align-items:center;padding:0 16px 12px"><div style="width:40px;height:40px;border-radius:50%;background:#C9CFD8;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700">S</div><div><b style="font-size:16px">Service recrutement</b><div style="font-size:13px;color:#7A818C">À : moi · Hier</div></div></div><div style="padding:0 16px"><div style="font-size:22px;font-weight:700;margin-bottom:14px">Suite à votre candidature</div><p style="font-size:16px;line-height:1.5;margin:0 0 12px">Bonjour,</p><p style="font-size:16px;line-height:1.5;margin:0 0 12px">Nous vous remercions de l’intérêt porté à notre entreprise.</p><p style="font-size:16px;line-height:1.5;margin:0 0 12px">Après étude attentive de votre candidature, nous ne pouvons malheureusement pas y donner suite pour le moment.</p><p style="font-size:16px;line-height:1.5;margin:0 0 12px">Nous vous souhaitons une bonne continuation dans vos recherches.</p><p style="font-size:16px;line-height:1.5;margin:0">Cordialement,<br>Le service recrutement</p></div></div>
+</div>
+<script>
+(function(){
+  // À remplacer par tes vrais liens
+  var LINKS={
+    cv:"cv-eliott-blanchard.pdf",
+    github:"https://github.com/Oliancem",
+    linkedin:"https://www.linkedin.com/in/eliott-blanchard-b2b11b220/"
+  };
+
+  var $=function(s,r){return (r||document).querySelector(s)};
+  var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+  var phone=$('#phone'),lock=$('#lock'),home=$('#home'),bar=$('#homebar');
+  var locked=true;
+
+  $$('[data-link]').forEach(function(a){a.href=LINKS[a.getAttribute('data-link')]});
+  $$('[data-linktext]').forEach(function(p){p.textContent=LINKS[p.getAttribute('data-linktext')].replace(/^https?:\/\/(www\.)?/,'')});
+
+  // graduations de l'icône Horloge
+  var ticks=$('#ticks'),NS='http://www.w3.org/2000/svg';
+  for(var i=0;i<12;i++){
+    var l=document.createElementNS(NS,'line'),big=i%3===0;
+    l.setAttribute('x1',30);l.setAttribute('x2',30);
+    l.setAttribute('y1',7.5);l.setAttribute('y2',big?11.5:10);
+    l.setAttribute('stroke-width',big?1.8:1.1);
+    l.setAttribute('transform','rotate('+(i*30)+' 30 30)');
+    ticks.appendChild(l);
+  }
+  function rot(id,a){$(id).setAttribute('transform','rotate('+a+' 30 30)')}
+
+  function pad(n){return n<10?'0'+n:''+n}
+  function tick(){
+    var d=new Date(),t=pad(d.getHours())+':'+pad(d.getMinutes());
+    $('#ltime').textContent=t;$('#stime').textContent=t;$('#dtime').textContent=t;
+    $('#ldate').textContent=d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+    $('#cdow').textContent=d.toLocaleDateString('fr-FR',{weekday:'short'}).replace('.','').toUpperCase();
+    $('#cday').textContent=d.getDate();
+    var s=d.getSeconds(),m=d.getMinutes()+s/60,h=(d.getHours()%12)+m/60;
+    rot('#hh',h*30);rot('#mh',m*6);rot('#sh',s*6);
+  }
+  tick();setInterval(tick,1000);
+
+  function setView(v){
+    phone.setAttribute('data-view',v);
+    bar.setAttribute('aria-label',v==='lock'?'Déverrouiller':'Retour à l’accueil');
+  }
+  function openApp(id){
+    $$('.appscreen').forEach(function(s){
+      var on=s.id===id;
+      s.classList.toggle('open',on);
+      s.inert=!on;
+    });
+    home.inert=true;
+    setView('app');
+    if(id==='maman')markRead();
+    phone.classList.toggle('dk',id==='photo');
+    if(id==='photo')requestAnimationFrame(showPhoto);
+    if(id==='photos')requestAnimationFrame(fitThumbs);
+    var b=$('#'+id+' .back');if(b)b.focus({preventScroll:true});
+  }
+  function goHome(){
+    $$('.appscreen').forEach(function(s){s.classList.remove('open');s.inert=true});
+    home.inert=false;
+    phone.classList.remove('dk');
+    setView('home');
+  }
+  function route(){
+    if(locked)return;
+    var h=location.hash.replace('#',''),el=h&&document.getElementById(h);
+    if(el&&el.classList.contains('appscreen'))openApp(h);
+    else goHome();
+  }
+  function unlock(){
+    if(!locked)return;
+    locked=false;
+    $('#shackle').setAttribute('d','M5 13V9a6 6 0 0 1 11.5-2.4');
+    lock.classList.remove('drag');
+    lock.style.transform='';
+    lock.classList.add('off');
+    lock.inert=true;
+    home.classList.remove('under');
+    route();
+  }
+
+  // glisser vers le haut
+  var y0=null;
+  lock.addEventListener('pointerdown',function(e){y0=e.clientY;lock.classList.add('drag');try{lock.setPointerCapture(e.pointerId)}catch(_){}});
+  lock.addEventListener('pointermove',function(e){
+    if(y0===null)return;
+    var dy=Math.min(0,e.clientY-y0);
+    lock.style.transform='translateY('+dy+'px)';
+    lock.style.opacity=String(Math.max(.3,1+dy/500));
+  });
+  lock.addEventListener('pointerup',function(e){
+    if(y0===null)return;
+    var dy=e.clientY-y0;y0=null;
+    lock.classList.remove('drag');
+    lock.style.opacity='';
+    if(dy<-110){unlock()}else{lock.style.transform=''}
+  });
+  lock.addEventListener('pointercancel',function(){y0=null;lock.classList.remove('drag');lock.style.transform='';lock.style.opacity=''});
+
+  bar.addEventListener('click',function(){
+    if(locked){unlock();return}
+    location.hash='';
+    goHome();
+  });
+  $$('[data-open]').forEach(function(b){b.addEventListener('click',function(){location.hash=b.getAttribute('data-open')})});
+  $$('[data-home]').forEach(function(b){b.addEventListener('click',function(){location.hash='';goHome()})});
+  window.addEventListener('hashchange',route);
+
+  // Messages
+  var mt=pad(new Date().getHours())+':'+pad(new Date().getMinutes());
+  $$('.mt').forEach(function(e){e.textContent=mt});
+  function markRead(){
+    $('#ud').classList.add('read');
+    var bd=$('#badge');if(bd)bd.hidden=true;
+  }
+  $$('[data-goto]').forEach(function(b){b.addEventListener('click',function(){location.hash=b.getAttribute('data-goto')})});
+  $('#msearch').addEventListener('input',function(e){
+    var q=e.target.value.trim().toLowerCase(),row=$('#mrow');
+    row.hidden=q!==''&&(row.textContent.toLowerCase().indexOf(q)<0);
+  });
+  var minput=$('#minput'),send=$('#send'),tbody=$('#tbody');
+  minput.addEventListener('input',function(){send.disabled=minput.value.trim()===''});
+  $('#composer').addEventListener('submit',function(e){
+    e.preventDefault();
+    var txt=minput.value.trim();if(!txt)return;
+    var old=$('.dl',tbody);if(old)old.remove();
+    var m=document.createElement('div');m.className='b me';m.textContent=txt;tbody.appendChild(m);
+    var d=document.createElement('div');d.className='dl';d.textContent='Distribué';tbody.appendChild(d);
+    $('#mprev').textContent=txt;
+    minput.value='';send.disabled=true;
+    tbody.scrollTop=tbody.scrollHeight;
+  });
+
+  // Rappels
+  var rlist=$('#rlist'),rinput=$('#rinput'),rplus=$('#rplus');
+  function rcount(){$('#rcount').textContent=$$('.rem:not(.done)',rlist).length}
+  rlist.addEventListener('click',function(e){
+    var b=e.target.closest('.rcheck');if(!b)return;
+    var r=b.parentNode,on=!r.classList.contains('done');
+    r.classList.toggle('done',on);b.setAttribute('aria-pressed',on?'true':'false');rcount();
+  });
+  rinput.addEventListener('input',function(){rplus.disabled=rinput.value.trim()===''});
+  $('#rform').addEventListener('submit',function(e){
+    e.preventDefault();
+    var t=rinput.value.trim();if(!t)return;
+    var r=document.createElement('div');r.className='rem';
+    var b=document.createElement('button');b.className='rcheck';b.setAttribute('aria-pressed','false');b.setAttribute('aria-label','Marquer comme terminé');
+    var w=document.createElement('div'),sp=document.createElement('span'),sm=document.createElement('small');
+    sp.className='rt';sp.textContent=t;sm.textContent='Aujourd’hui';
+    w.appendChild(sp);w.appendChild(sm);r.appendChild(b);r.appendChild(w);rlist.appendChild(r);
+    rinput.value='';rplus.disabled=true;rcount();
+  });
+
+  // MonCV
+  $('#cvzoom').addEventListener('click',function(){$('#cvwrap').classList.toggle('zoom')});
+
+  // Photos
+  var SH=$$('#shots .shot'),N=SH.length,cur=0,pgrid=$('#pgrid');
+  $('#pcount').textContent=N+' captures d’écran';
+  SH.forEach(function(sh,i){
+    var b=document.createElement('button');b.className='thumb';
+    b.setAttribute('aria-label','Capture d’écran '+(i+1)+' : '+sh.getAttribute('data-title'));
+    var c=sh.cloneNode(true);c.setAttribute('aria-hidden','true');c.removeAttribute('data-title');
+    b.appendChild(c);
+    b.addEventListener('click',function(){cur=i;location.hash='photo'});
+    pgrid.appendChild(b);
+  });
+  function fitThumbs(){$$('.thumb').forEach(function(b){var w=b.clientWidth;if(w)b.firstChild.style.transform='scale('+(w/390)+')'})}
+  window.addEventListener('resize',function(){fitThumbs();if(phone.classList.contains('dk'))showPhoto()});
+  fitThumbs();
+  var vprev=$('#vprev'),vnext=$('#vnext');
+  function showPhoto(){
+    var st=$('#vstage'),fr=$('#vframe');
+    fr.innerHTML='';
+    var c=SH[cur].cloneNode(true);c.setAttribute('role','img');c.setAttribute('aria-label',SH[cur].getAttribute('data-title'));c.removeAttribute('data-title');
+    fr.appendChild(c);
+    var sc=Math.min((st.clientWidth-32)/390,(st.clientHeight-12)/844);
+    if(!(sc>0))sc=.5;
+    fr.style.width=(390*sc)+'px';fr.style.height=(844*sc)+'px';c.style.transform='scale('+sc+')';
+    $('#vtitle').textContent=SH[cur].getAttribute('data-title');
+    $('#vcount').textContent=(cur+1)+' sur '+N;
+    vprev.disabled=cur===0;vnext.disabled=cur===N-1;
+  }
+  function step(d){var n=cur+d;if(n<0||n>=N)return;cur=n;showPhoto()}
+  vprev.addEventListener('click',function(){step(-1)});
+  vnext.addEventListener('click',function(){step(1)});
+  var vx=null,vs=$('#vstage');
+  vs.addEventListener('pointerdown',function(e){vx=e.clientX});
+  vs.addEventListener('pointerup',function(e){if(vx===null)return;var dx=e.clientX-vx;vx=null;if(dx<-50)step(1);else if(dx>50)step(-1)});
+  vs.addEventListener('pointercancel',function(){vx=null});
+  document.addEventListener('keydown',function(e){
+    if(!phone.classList.contains('dk'))return;
+    if(e.key==='ArrowLeft')step(-1);else if(e.key==='ArrowRight')step(1);
+  });
+
+  // copier
+  var toast=$('#toast'),tt;
+  function say(m){toast.textContent=m;toast.classList.add('show');clearTimeout(tt);tt=setTimeout(function(){toast.classList.remove('show')},1600)}
+  $$('.copy').forEach(function(b){
+    b.addEventListener('click',function(){
+      var el=$(b.getAttribute('data-copy')),txt=el.textContent.trim();
+      function fallback(){
+        var r=document.createRange();r.selectNodeContents(el);
+        var s=getSelection();s.removeAllRanges();s.addRange(r);
+        say('Sélectionné, copie-le à la main');
+      }
+      if(navigator.clipboard&&navigator.clipboard.writeText){
+        navigator.clipboard.writeText(txt).then(function(){say('Copié')},fallback);
+      }else fallback();
+    });
+  });
+})();
+</script>
+
+</html>
